@@ -1,11 +1,9 @@
 package jdbc;
 
 import util.JDBCUtils;
+import util.JDBCUtilsNormal;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.Scanner;
 
 public class jdbcDemo5 {
@@ -27,18 +25,20 @@ public class jdbcDemo5 {
             return false;
         }
         Connection conn = null;
-        Statement stmt = null;
+        PreparedStatement stmt = null;
         ResultSet rs = null;
         try {
             conn = JDBCUtils.getConnection();
-            String sql = "select * from user where username = '"+username+"' and password = '"+password+"'";
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery(sql);
+            String sql = "select * from user where username = ? and password = ?";
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(1,username);
+            stmt.setString(2,password);
+            rs = stmt.executeQuery();
             return rs.next();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }finally {
-            JDBCUtils.close(rs,stmt,conn);
+            JDBCUtilsNormal.close(rs,stmt,conn);
         }
     }
 }
